@@ -3,6 +3,7 @@ package net.lucode.hackware.magicindicator.buildins.commonnavigator.abs;
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.view.ViewGroup;
 
 /**
  * CommonNavigator适配器，通过它可轻松切换不同的指示器样式
@@ -15,9 +16,9 @@ public abstract class CommonNavigatorAdapter {
 
     public abstract int getCount();
 
-    public abstract IPagerTitleView getTitleView(Context context, int index);
+    public abstract IPagerTitleView getTitleView(ViewGroup parent, int index);
 
-    public abstract IPagerIndicator getIndicator(Context context);
+    public abstract IPagerIndicator getIndicator(ViewGroup parent);
 
     public float getTitleWeight(Context context, int index) {
         return 1;

@@ -3,6 +3,7 @@ package net.lucode.hackware.magicindicator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import net.lucode.hackware.magicindicator.abs.IPagerNavigator;
@@ -16,11 +17,15 @@ public class MagicIndicator extends FrameLayout {
     private IPagerNavigator mNavigator;
 
     public MagicIndicator(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public MagicIndicator(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public MagicIndicator(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -53,11 +58,13 @@ public class MagicIndicator extends FrameLayout {
             mNavigator.onDetachFromMagicIndicator();
         }
         mNavigator = navigator;
-        removeAllViews();
         if (mNavigator instanceof View) {
-            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            removeAllViews();
+            ViewGroup.LayoutParams lp = ((View) mNavigator).getLayoutParams();
+            if (lp == null)
+                lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             addView((View) mNavigator, lp);
-            mNavigator.onAttachToMagicIndicator();
         }
+        mNavigator.onAttachToMagicIndicator();
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -21,7 +22,15 @@ public class SimplePagerTitleView extends TextView implements IMeasurablePagerTi
     protected int mNormalColor;
 
     public SimplePagerTitleView(Context context) {
-        super(context, null);
+        this(context, null);
+    }
+
+    public SimplePagerTitleView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public SimplePagerTitleView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         init(context);
     }
 

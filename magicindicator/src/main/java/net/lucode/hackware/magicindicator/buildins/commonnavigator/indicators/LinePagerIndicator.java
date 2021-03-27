@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -46,7 +47,15 @@ public class LinePagerIndicator extends View implements IPagerIndicator {
     private RectF mLineRect = new RectF();
 
     public LinePagerIndicator(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public LinePagerIndicator(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public LinePagerIndicator(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         init(context);
     }
 

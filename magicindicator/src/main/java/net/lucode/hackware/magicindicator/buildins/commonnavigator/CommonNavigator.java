@@ -2,6 +2,7 @@ package net.lucode.hackware.magicindicator.buildins.commonnavigator;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,15 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
     };
 
     public CommonNavigator(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public CommonNavigator(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public CommonNavigator(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         mNavigatorHelper = new NavigatorHelper();
         mNavigatorHelper.setNavigatorScrollListener(this);
     }
@@ -114,7 +123,7 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
         }
     }
 
-    private void init() {
+    protected void init() {
         removeAllViews();
 
         View root;
@@ -142,23 +151,28 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
      */
     private void initTitlesAndIndicator() {
         for (int i = 0, j = mNavigatorHelper.getTotalCount(); i < j; i++) {
-            IPagerTitleView v = mAdapter.getTitleView(getContext(), i);
+            IPagerTitleView v = mAdapter.getTitleView(mTitleContainer, i);
             if (v instanceof View) {
                 View view = (View) v;
-                LinearLayout.LayoutParams lp;
-                if (mAdjustMode) {
-                    lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-                    lp.weight = mAdapter.getTitleWeight(getContext(), i);
-                } else {
-                    lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                ViewGroup.LayoutParams lp = ((View) v).getLayoutParams();
+                if (lp == null) {
+                    if (mAdjustMode) {
+                        LinearLayout.LayoutParams lp1 = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+                        lp1.weight = mAdapter.getTitleWeight(getContext(), i);
+                        lp = lp1;
+                    } else {
+                        lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                    }
                 }
                 mTitleContainer.addView(view, lp);
             }
         }
         if (mAdapter != null) {
-            mIndicator = mAdapter.getIndicator(getContext());
+            mIndicator = mAdapter.getIndicator(mIndicatorContainer);
             if (mIndicator instanceof View) {
-                LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                ViewGroup.LayoutParams lp = ((View) mIndicator).getLayoutParams();
+                if (lp == null)
+                    lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
                 mIndicatorContainer.addView((View) mIndicator, lp);
             }
         }
@@ -389,6 +403,10 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
 
     public LinearLayout getTitleContainer() {
         return mTitleContainer;
+    }
+
+    public LinearLayout getIndicatorContainer() {
+        return mIndicatorContainer;
     }
 
     public int getRightPadding() {

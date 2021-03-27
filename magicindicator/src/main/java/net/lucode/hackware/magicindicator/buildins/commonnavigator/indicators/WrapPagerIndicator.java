@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -22,6 +23,12 @@ import java.util.List;
  * Created by hackware on 2016/6/26.
  */
 public class WrapPagerIndicator extends View implements IPagerIndicator {
+    public static final int MODE_MATCH_EDGE = 0;   // 直线宽度 == title宽度 - 2 * mXOffset
+    public static final int MODE_WRAP_CONTENT = 1;    // 直线宽度 == title内容宽度 - 2 * mXOffset
+    public static final int MODE_EXACTLY = 2;  // 直线宽度 == mLineWidth
+
+    private int mMode;  // 默认为MODE_MATCH_EDGE模式
+
     private int mVerticalPadding;
     private int mHorizontalPadding;
     private int mFillColor;
@@ -36,7 +43,15 @@ public class WrapPagerIndicator extends View implements IPagerIndicator {
     private boolean mRoundRadiusSet;
 
     public WrapPagerIndicator(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public WrapPagerIndicator(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public WrapPagerIndicator(Context context, AttributeSet attrs, int defStyleAtt) {
+        super(context, attrs, defStyleAtt);
         init(context);
     }
 
@@ -63,10 +78,22 @@ public class WrapPagerIndicator extends View implements IPagerIndicator {
         PositionData current = FragmentContainerHelper.getImitativePositionData(mPositionDataList, position);
         PositionData next = FragmentContainerHelper.getImitativePositionData(mPositionDataList, position + 1);
 
-        mRect.left = current.mContentLeft - mHorizontalPadding + (next.mContentLeft - current.mContentLeft) * mEndInterpolator.getInterpolation(positionOffset);
-        mRect.top = current.mContentTop - mVerticalPadding;
-        mRect.right = current.mContentRight + mHorizontalPadding + (next.mContentRight - current.mContentRight) * mStartInterpolator.getInterpolation(positionOffset);
-        mRect.bottom = current.mContentBottom + mVerticalPadding;
+        if (mMode == MODE_MATCH_EDGE) {
+            mRect.left = current.mLeft - mHorizontalPadding + (next.mLeft - current.mLeft) * mEndInterpolator.getInterpolation(positionOffset);
+            mRect.top = current.mTop - mVerticalPadding;
+            mRect.right = current.mRight + mHorizontalPadding + (next.mRight - current.mRight) * mStartInterpolator.getInterpolation(positionOffset);
+            mRect.bottom = current.mBottom + mVerticalPadding;
+        } else if (mMode == MODE_WRAP_CONTENT) {
+            mRect.left = current.mContentLeft - mHorizontalPadding + (next.mContentLeft - current.mContentLeft) * mEndInterpolator.getInterpolation(positionOffset);
+            mRect.top = current.mContentTop - mVerticalPadding;
+            mRect.right = current.mContentRight + mHorizontalPadding + (next.mContentRight - current.mContentRight) * mStartInterpolator.getInterpolation(positionOffset);
+            mRect.bottom = current.mContentBottom + mVerticalPadding;
+        } else {
+            mRect.left = current.mLeft + (current.width() - mHorizontalPadding) / 2;
+            mRect.top = current.mTop + (current.height() - mVerticalPadding) / 2;
+            mRect.right = current.mRight + (current.width() + mHorizontalPadding) / 2;
+            mRect.bottom = current.mBottom + (current.height() + mVerticalPadding) / 2;
+        }
 
         if (!mRoundRadiusSet) {
             mRoundRadius = mRect.height() / 2;
@@ -90,6 +117,18 @@ public class WrapPagerIndicator extends View implements IPagerIndicator {
 
     public Paint getPaint() {
         return mPaint;
+    }
+
+    public int getMode() {
+        return mMode;
+    }
+
+    public void setMode(int mode) {
+        if (mode == MODE_EXACTLY || mode == MODE_MATCH_EDGE || mode == MODE_WRAP_CONTENT) {
+            mMode = mode;
+        } else {
+            throw new IllegalArgumentException("mode " + mode + " not supported.");
+        }
     }
 
     public int getVerticalPadding() {
